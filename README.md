@@ -2,11 +2,11 @@
 
 > A fair-trade digital marketplace connecting coastal and regional Karnataka artisans directly with conscious buyers. Zero middleman margins, transparent artisan-first pricing, and bilingual support (ಕನ್ನಡ & English).
 
-🌐 **Live Website:** [http://kalakatte.duckdns.org](http://kalakatte.duckdns.org) *(Mirror: [http://129.159.239.139](http://129.159.239.139))*
+ **Live Website:** [http://kalakatte.duckdns.org](http://kalakatte.duckdns.org) *(Mirror: [http://129.159.239.139](http://129.159.239.139))*
 
 ---
 
-## ✨ Features
+## Features
 
 - **Artisan-First Direct Sales:** Handcrafted GI-tagged and heritage crafts from Karnataka (Kasuti embroidery, Kinnal woodcraft, Chittara murals, Channapatna toys, Terracotta pottery, and more).
 - **Transparent Cost Breakdown:** Each product details raw material cost, artisan labor hours, and genuine fair-wage payout.
@@ -18,7 +18,7 @@
 
 ---
 
-## 🛠️ Architecture & Tech Stack
+## Architecture & Tech Stack
 
 ```mermaid
 graph LR
@@ -37,7 +37,7 @@ graph LR
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 KalaKatte/
@@ -59,7 +59,7 @@ KalaKatte/
 
 ---
 
-## 🚀 Local Development
+## Local Development
 
 ### 1. Clone the repository
 ```bash
@@ -86,7 +86,7 @@ Open [http://localhost:8000](http://localhost:8000) in your browser. The API int
 
 ---
 
-## 🌐 Production Deployment
+## Production Deployment
 
 The project includes automated deployment for Oracle Cloud Linux:
 
@@ -97,6 +97,6 @@ SSH_KEY=~/path/to/ssh-key.key SSH_REMOTE=opc@129.159.239.139 bash backend/deploy
 
 ---
 
-## 📜 License
+## License
 
 MIT License &copy; 2026 KalaKatte Contributors.
