@@ -1,0 +1,22 @@
+[Unit]
+Description=KalaKatte FastAPI backend
+After=network.target
+
+[Service]
+Type=exec
+User=opc
+WorkingDirectory=/home/opc/KalaKatte/backend
+EnvironmentFile=-/etc/environment
+Environment="KK_SECRET_KEY=9f8c6b24d7814b7e80f12d8a3c9b749520a1f6874e0c9842a5c9f0e1b3d56782"
+ExecStart=/home/opc/KalaKatte/backend/venv/bin/gunicorn main:app \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --workers 2 \
+    --bind 0.0.0.0:8000 \
+    --access-logfile /home/opc/KalaKatte/backend/access.log \
+    --error-logfile  /home/opc/KalaKatte/backend/error.log \
+    --log-level info
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
