@@ -70,6 +70,23 @@ input,select,textarea{width:100%;padding:10px;border:1px solid var(--line);borde
 .muted{color:var(--muted)}
 footer{border-top:1px solid var(--line);padding:16px 0;font-size:13px;color:var(--muted)}
 @media(max-width:700px){.two{grid-template-columns:1fr}}
+/* === AUTH MODAL === */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:999;backdrop-filter:blur(3px)}
+.modal{background:var(--paper);border-radius:10px;padding:28px 28px 20px;width:min(420px,94vw);box-shadow:0 8px 40px rgba(0,0,0,.25)}
+.modal h2{margin:0 0 18px;color:var(--indigo);font-size:21px}
+.modal .tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--line)}
+.modal .tabs button{flex:1;background:none;border:0;padding:8px;font:inherit;font-size:15px;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px}
+.modal .tabs button.on{color:var(--indigo);border-color:var(--mustard);font-weight:600}
+.modal .err{color:var(--red);font-size:13px;margin-top:8px;min-height:18px}
+.modal .role-row{display:flex;gap:10px;margin:12px 0}
+.modal .role-btn{flex:1;padding:10px;border:2px solid var(--line);border-radius:6px;background:none;font:inherit;font-size:14px;cursor:pointer;transition:all .15s}
+.modal .role-btn.on{border-color:var(--indigo);background:var(--sand);font-weight:600}
+.modal .close{position:absolute;top:14px;right:16px;background:none;border:0;font-size:20px;cursor:pointer;color:var(--muted)}
+.modal-wrap{position:relative}
+.user-pill{display:flex;align-items:center;gap:8px;font-size:14px;color:#fff;opacity:.9}
+.user-pill button{background:none;border:1px solid rgba(255,255,255,.45);color:#fff;border-radius:4px;padding:4px 10px;font:inherit;font-size:13px;cursor:pointer}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -78,7 +95,7 @@ footer{border-top:1px solid var(--line);padding:16px 0;font-size:13px;color:var(
 /* ============================================================
    CONFIG  -- backend switch lives here (see BACKEND.md)
    ============================================================ */
-const CONFIG = { USE_MOCK: true, API_BASE: '', LABOUR_RATE: 80 };
+const CONFIG = { USE_MOCK: false, API_BASE: '', LABOUR_RATE: 80 };
 
 /* ============================================================
    I18N  -- kn (default), tcy (Tulu, written in Kannada script), en
@@ -134,6 +151,21 @@ function art(p){
 const img = p => p.image_url || art(p);
 
 /* ============================================================
+   AUTH SESSION  -- token + user info stored in localStorage
+   ============================================================ */
+let session = ls('kk_session');   /* { token, user_id, name, role } | null */
+const saveSession = s => { session = s; ls('kk_session', s); };
+const clearSession = () => saveSession(null);
+const authHeaders = () => session?.token ? { Authorization: 'Bearer ' + session.token } : {};
+
+/* Auth modal state */
+let authModal = false;      /* true = modal open */
+let authTab = 'login';      /* 'login' | 'register' */
+let authRole = 'buyer';     /* for register form */
+let authErr = '';
+let authLoading = false;
+
+/* ============================================================
    API LAYER  -- the ONLY place that talks to data. Swap mock -> real here.
    Contract for every function is in BACKEND.md.
    ============================================================ */
@@ -151,7 +183,12 @@ const mock = {
   set(k,v){ mem[k]=v; ls('kk_'+k, v); }
 };
 async function http(method, path, body){
-  const r = await fetch(CONFIG.API_BASE + path, { method, headers:{'Content-Type':'application/json'}, body: body ? JSON.stringify(body) : undefined });
+  const r = await fetch(CONFIG.API_BASE + path, {
+    method,
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if(r.status === 401){ clearSession(); authModal=true; render(); throw new Error('Login required'); }
   if(!r.ok) throw new Error(method+' '+path+' -> '+r.status);
   return r.json();
 }
@@ -162,7 +199,7 @@ const API = {
     if(!CONFIG.USE_MOCK) return http('POST','/api/products', d);
     const p = {...d, id:'p'+Date.now()}; mock.set('products',[p,...mock.get('products')]); return p;
   },
-  async createOrder(d){   /* d.payment_method 'demo' | 'cod' ; demo payment is mocked -> status 'paid' */
+  async createOrder(d){
     if(!CONFIG.USE_MOCK) return http('POST','/api/orders', d);
     const o = {...d, id:'KK'+String(Date.now()).slice(-6), status:d.payment_method==='demo'?'paid':'placed', created_at:new Date().toISOString()};
     mock.set('orders',[o,...mock.get('orders')]); return o;
@@ -171,6 +208,16 @@ const API = {
   async setOrderStatus(id, status){
     if(!CONFIG.USE_MOCK) return http('PATCH','/api/orders/'+id, {status});
     const l = mock.get('orders').map(o=>o.id===id?{...o,status}:o); mock.set('orders',l); return l.find(o=>o.id===id);
+  },
+  /* Auth */
+  async register(email, password, name, role){ return http('POST','/api/auth/register',{email,password,name,role}); },
+  async login(email, password){ return http('POST','/api/auth/login',{email,password}); },
+  /* Image upload — multipart, no JSON content-type */
+  async uploadImage(file){
+    const fd = new FormData(); fd.append('file', file);
+    const r = await fetch('/api/upload', { method:'POST', headers: authHeaders(), body: fd });
+    if(!r.ok) throw new Error('Upload failed: ' + r.status);
+    return r.json();   /* { url: "/uploads/xxx.jpg" } */
   }
 };
 
@@ -187,16 +234,48 @@ const cartCount = () => cart.reduce((n,i)=>n+i.qty,0);
 /* ============================================================
    VIEWS
    ============================================================ */
+function authModalView(){
+  if(!authModal) return '';
+  const isLogin = authTab === 'login';
+  return `<div class="modal-bg" id="auth-bg">
+    <div class="modal modal-wrap">
+      <button class="close" data-a="auth-close" aria-label="Close">✕</button>
+      <h2>${isLogin ? (lang==='en'?'Sign in':'ಲಾಗಿನ್ ಆಗಿ') : (lang==='en'?'Create account':'ಖಾತೆ ತೆರೆಯಿರಿ')}</h2>
+      <div class="tabs">
+        <button class="${authTab==='login'?'on':''}" data-a="auth-tab" data-v="login">${lang==='en'?'Login':'ಲಾಗಿನ್'}</button>
+        <button class="${authTab==='register'?'on':''}" data-a="auth-tab" data-v="register">${lang==='en'?'Register':'ನೋಂದಣಿ'}</button>
+      </div>
+      ${!isLogin ? `<div class="role-row">
+        <button class="role-btn ${authRole==='buyer'?'on':''}" data-a="auth-role" data-v="buyer">🛍 ${lang==='en'?'I want to buy':'ಖರೀದಿ ಮಾಡಲು'}</button>
+        <button class="role-btn ${authRole==='artisan'?'on':''}" data-a="auth-role" data-v="artisan">🎨 ${lang==='en'?'I am an artisan':'ನಾನು ಕಲಾವಿದ'}</button>
+      </div>` : ''}
+      ${!isLogin ? `<label>${lang==='en'?'Your name':'ನಿಮ್ಮ ಹೆಸರು'}</label><input id="auth-name" type="text" placeholder="${lang==='en'?'Full name':'ಹೆಸರು'}" autocomplete="name">` : ''}
+      <label>${lang==='en'?'Email':'ಇಮೇಲ್'}</label><input id="auth-email" type="email" placeholder="you@example.com" autocomplete="email">
+      <label>${lang==='en'?'Password':'ಗುಪ್ತಪದ'}</label><input id="auth-pass" type="password" placeholder="${lang==='en'?'Min 6 chars':'ಕನಿಷ್ಒ0 6 ಅಕ್ಷರ'}" autocomplete="${isLogin?'current-password':'new-password'}">
+      <div class="err">${esc(authErr)}</div>
+      <div class="row" style="margin-top:4px">
+        <button class="btn ${authLoading?'':'red'}" data-a="auth-submit" style="width:100%">
+          ${authLoading ? '<span class="spin"></span>' : (isLogin ? (lang==='en'?'Sign in':'ಲಾಗಿನ್') : (lang==='en'?'Create account':'ಖಾತೆ ತೆರೆಯಿರಿ'))}
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
 function layout(route, body){
   const a = r => route===r ? 'on' : '';
-  return `<header><div class="wrap bar">
+  const userNav = session
+    ? `<div class="user-pill"><span>${esc(session.name)}</span><button data-a="logout">${lang==='en'?'Logout':'ನಿರ್ಗಮನ'}</button></div>`
+    : `<button class="btn" data-a="auth-open" style="font-size:14px;padding:6px 14px">${lang==='en'?'Login / Register':'ಲಾಗಿನ್'}</button>`;
+  return `${authModalView()}<header><div class="wrap bar">
     <a href="#/" class="brand">${t('brand')}<small>${lang==='en'?'ಕಲಾಕಟ್ಟೆ':'KalaKatte'}</small></a>
     <nav>
       <a href="#/" class="${a('')}">${t('shop')}</a>
-      <a href="#/sell" class="${a('sell')}">${t('sell')}</a>
-      <a href="#/orders" class="${a('orders')}">${t('orders')}</a>
+      ${session?.role==='artisan' ? `<a href="#/sell" class="${a('sell')}">${t('sell')}</a>` : ''}
+      ${session ? `<a href="#/orders" class="${a('orders')}">${t('orders')}</a>` : ''}
       <a href="#/cart" class="${a('cart')}">${t('cart')}${cartCount()?`<span class="badge">${cartCount()}</span>`:''}</a>
       <div class="lang">${[['kn','ಕನ್ನಡ'],['tcy','ತುಳು'],['en','EN']].map(([k,n])=>`<button data-a="lang" data-v="${k}" class="${lang===k?'on':''}">${n}</button>`).join('')}</div>
+      ${userNav}
     </nav></div></header><div class="stitch"></div>
     <main><div class="wrap">${flash?`<div class="flash">${esc(flash)}</div>`:''}${body}</div></main>
     <footer><div class="wrap">${t('footer')}</div></footer>`;
@@ -254,19 +333,27 @@ async function cartView(){
 }
 
 async function ordersView(){
+  if(!session){ authModal=true; return `<h1>${t('orders')}</h1><p class="muted">${lang==='en'?'Please login to view your orders':'ನಿಮ್ಮ ಆರ್ಡರ್‌ಗಳನ್ನು ನೋಡಲು ಲಾಗಿನ್ ಆಗಿ'}</p>`; }
   const list = await API.listOrders();
   if(!list.length) return `<h1>${t('orders')}</h1><p class="muted">${t('noOrders')}</p>`;
   const steps = ['placed','paid','shipped'];
+  const isArtisan = session?.role === 'artisan';
   return `<h1>${t('orders')}</h1>` + list.map(o=>{
     const idx = steps.indexOf(o.status);
     return `<div class="box"><b>${t('orderId')}: ${esc(o.id)}</b> <span class="muted">· ₹${o.total}</span>
       <div class="sub">${esc((o.items||[]).map(i=>i.name+' × '+i.qty).join(', '))}</div>
-      <div class="track">${steps.map((s,n)=>`<span class="${n<=idx?'done':''}">${t(s)}</span>`).join('')}</div>
-      ${o.status!=='shipped'?`<div class="row"><button class="btn ghost" data-a="ship" data-v="${esc(o.id)}">${t('markShipped')}</button></div>`:''}</div>`;
+      <div class="track">${steps.map((s,n)=>`<span class="${n<=idx?'done':''}">  ${t(s)}</span>`).join('')}</div>
+      ${isArtisan && o.status!=='shipped'?`<div class="row"><button class="btn ghost" data-a="ship" data-v="${esc(o.id)}">${t('markShipped')}</button></div>`:''}</div>`;
   }).join('');
 }
 
 function sellView(){
+  if(!session || session.role !== 'artisan'){
+    return `<h1>${t('sellTitle')}</h1><div class="box form">
+      <p>${lang==='en'?'Only artisans can list products. Please login with an artisan account.':'ಕಲಾವಿದ ಖಾತೆಯಿಂದ ಲಾಗಿನ್ ಆದ ನಂತರ ಮಾರಾಟಕ್ಕೆ ಇಡಬಹುದು.'}</p>
+      <button class="btn" data-a="auth-open">${lang==='en'?'Login / Register':'ಲಾಗಿನ್ / ನೋಂದಣಿ'}</button>
+    </div>`;
+  }
   const f = (k,v='') => esc(draft[k] ?? v);
   const head = `<h1>${t('sellTitle')}</h1><div class="steps">${[1,2,3].map(n=>`<span class="${sellStep===n?'on':''}">${t('step'+n)}</span>`).join('')}</div><div class="form">`;
   let body = '';
@@ -313,7 +400,45 @@ function addToCart(id){ const i = cart.find(c=>c.id===id); i ? i.qty++ : cart.pu
 document.addEventListener('click', async e=>{
   const el = e.target.closest('[data-a]'); if(!el) return;
   const a = el.dataset.a, v = el.dataset.v;
+
+  /* --- Language --- */
   if(a==='lang'){ lang=v; ls('kk_lang',v); }
+
+  /* --- Auth modal open/close --- */
+  else if(a==='auth-open'){ authModal=true; authErr=''; }
+  else if(a==='auth-close'){ authModal=false; authErr=''; }
+  else if(a==='auth-tab'){ authTab=v; authErr=''; }
+  else if(a==='auth-role'){ authRole=v; }
+  else if(a==='logout'){ clearSession(); flash=''; }
+
+  /* --- Auth submit --- */
+  else if(a==='auth-submit'){
+    const email = document.getElementById('auth-email')?.value?.trim();
+    const pass  = document.getElementById('auth-pass')?.value;
+    const name  = document.getElementById('auth-name')?.value?.trim();
+    if(!email || !pass){ authErr = lang==='en'?'Please fill all fields':'ಎಲ್ಲಾ ವಿವರ ತುಂಬಿ'; render(); return; }
+    authLoading = true; authErr = ''; render();
+    try{
+      let data;
+      if(authTab === 'login'){
+        data = await API.login(email, pass);
+      } else {
+        if(!name){ authErr = lang==='en'?'Enter your name':'ಹೆಸರು ನಮೂದಿಸಿ'; authLoading=false; render(); return; }
+        data = await API.register(email, pass, name, authRole);
+      }
+      saveSession(data);
+      authModal = false;
+      flash = lang==='en' ? `Welcome, ${data.name}!` : `ಸ್ವಾಗತ, ${data.name}!`;
+    } catch(err){
+      authErr = lang==='en' ? 'Invalid credentials or email taken' : 'ತಪ್ಪಾದ ವಿವರ ಅಥವಾ ಇಮೇಲ್ ಬಳಕೆಯಲ್ಲಿದೆ';
+    }
+    authLoading = false;
+  }
+
+  /* --- Modal background click to close --- */
+  else if(e.target.id==='auth-bg'){ authModal=false; authErr=''; }
+
+  /* --- Shop actions --- */
   else if(a==='filter'){ filter=v; }
   else if(a==='add'){ addToCart(v); }
   else if(a==='buy'){ addToCart(v); location.hash='#/cart'; return; }
@@ -339,14 +464,29 @@ document.addEventListener('input', e=>{
   if(el.dataset.b) buyer[el.dataset.b] = el.value;
   if(el.dataset.q){ const i=cart.find(c=>c.id===el.dataset.q); if(i && +el.value>0){ i.qty=+el.value; saveCart(); } }
 });
-document.addEventListener('change', e=>{
+document.addEventListener('change', async e=>{
   if(e.target.id==='photo' && e.target.files[0]){
-    const fr = new FileReader();   /* mock only: stores data URL. Real backend: upload file, store returned URL */
-    fr.onload = () => { draft.image_url = fr.result; render(); };
-    fr.readAsDataURL(e.target.files[0]);
+    const file = e.target.files[0];
+    if(CONFIG.USE_MOCK){
+      /* mock mode: store as data URL */
+      const fr = new FileReader();
+      fr.onload = () => { draft.image_url = fr.result; render(); };
+      fr.readAsDataURL(file);
+    } else {
+      /* real backend: upload and store returned URL */
+      try {
+        const { url } = await API.uploadImage(file);
+        draft.image_url = url;
+        render();
+      } catch(err) {
+        alert(lang==='en' ? 'Image upload failed: ' + err.message : 'ಚಿತ್ರ ಅಪ್ಲೋಡ್ ಆಗಲಿಲ್ಲ');
+      }
+    }
   }
   if(e.target.dataset.q) render();
 });
+/* Keyboard: close modal on Escape */
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && authModal){ authModal=false; authErr=''; render(); } });
 render();
 </script>
 </body>
