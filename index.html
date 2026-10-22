@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ಕಲಾಕಟ್ಟೆ · KalaKatte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;600;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* === STYLES === Palette from Kasuti thread colours: indigo, kasuti red, mustard, leaf green on linen */
+:root{--bg:#FAF8F3;--paper:#FFFFFF;--sand:#EFE9DB;--indigo:#1F2A5A;--red:#B3261E;--mustard:#D9A21B;--green:#3E6B48;--ink:#231F20;--line:#DDD4BF;--muted:#6B6458}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans Kannada','Noto Sans',system-ui,sans-serif;line-height:1.6}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+header{background:var(--indigo);color:#fff}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 0}
+.brand{font-weight:700;font-size:22px}
+.brand small{font-weight:400;opacity:.75;margin-left:8px;font-size:13px}
+nav{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+nav a{padding:6px 12px;border-radius:4px}
+nav a.on{background:rgba(255,255,255,.16)}
+.badge{background:var(--red);color:#fff;border-radius:10px;padding:0 7px;font-size:12px;margin-left:4px}
+.lang{display:flex;border:1px solid rgba(255,255,255,.45);border-radius:4px;overflow:hidden;margin-left:8px}
+.lang button{background:none;border:0;color:#fff;font:inherit;font-size:14px;padding:4px 10px;cursor:pointer}
+.lang button.on{background:var(--mustard);color:var(--ink)}
+.stitch{height:8px;background:var(--sand) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='8'><path d='M2 1l4 6M6 1L2 7' stroke='%23B3261E' stroke-width='1.4' fill='none'/><path d='M10 1l4 6M14 1l-4 6' stroke='%231F2A5A' stroke-width='1.4' fill='none'/></svg>") repeat-x}
+main{padding:24px 0 48px;min-height:60vh}
+h1{font-size:26px;margin:0 0 16px;line-height:1.35}
+h2{font-size:20px;margin:24px 0 8px}
+h3{font-size:16px;margin:4px 0}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.chip{border:1px solid var(--indigo);background:none;color:var(--indigo);padding:6px 14px;border-radius:16px;font:inherit;font-size:14px;cursor:pointer}
+.chip.on{background:var(--indigo);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.card{display:block;background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.card img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:var(--sand)}
+.cb{padding:12px}
+.tag{font-size:12px;color:var(--red);font-weight:600}
+.sub{font-size:13px;color:var(--muted)}
+.price{font-weight:700;color:var(--indigo);margin-top:4px}
+.btn{background:var(--indigo);color:#fff;border:0;padding:10px 18px;border-radius:4px;font:inherit;cursor:pointer}
+.btn.red{background:var(--red)}
+.btn.ghost{background:none;color:var(--indigo);border:1px solid var(--indigo)}
+.btn:focus-visible,.chip:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--mustard);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.two img{width:100%;aspect-ratio:1;object-fit:cover;border:1px solid var(--line);border-radius:6px;background:var(--sand)}
+.box{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px;margin-top:16px}
+table{width:100%;border-collapse:collapse}
+td{padding:6px 0;border-bottom:1px solid var(--line)}
+td:last-child{text-align:right}
+tr.tot td{font-weight:700;border-bottom:0;color:var(--indigo)}
+label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:4px;background:var(--paper);font:inherit}
+.steps{display:flex;gap:6px;margin-bottom:8px}
+.steps span{flex:1;padding:6px 0;border-bottom:3px solid var(--line);font-size:14px;color:var(--muted)}
+.steps span.on{border-color:var(--mustard);color:var(--ink);font-weight:600}
+.form{max-width:520px}
+.flash{background:#E7F0E9;border:1px solid var(--green);color:var(--green);padding:10px 14px;border-radius:4px;margin-bottom:16px}
+.track{display:flex;gap:6px;margin-top:8px}
+.track span{flex:1;text-align:center;font-size:13px;padding:4px;border-radius:4px;background:var(--sand);color:var(--muted)}
+.track span.done{background:var(--green);color:#fff}
+.item{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.item img{width:64px;height:64px;object-fit:cover;border-radius:4px}
+.item .g{flex:1}
+.item input{width:64px}
+.prev{max-width:220px;margin-top:10px;border-radius:6px;border:1px solid var(--line)}
+.muted{color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:16px 0;font-size:13px;color:var(--muted)}
+@media(max-width:700px){.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ============================================================
+   CONFIG  -- backend switch lives here (see BACKEND.md)
+   ============================================================ */
+const CONFIG = { USE_MOCK: true, API_BASE: '', LABOUR_RATE: 80 };
+
+/* ============================================================
+   I18N  -- kn (default), tcy (Tulu, written in Kannada script), en
+   Missing tcy keys fall back to kn. Tulu strings need native review.
+   ============================================================ */
+const T = {
+kn:{brand:'ಕಲಾಕಟ್ಟೆ',tagline:'ಕರಾವಳಿಯ ಕೈಕಲೆ, ಕಲಾವಿದರಿಂದ ನೇರವಾಗಿ ನಿಮಗೆ',shop:'ಅಂಗಡಿ',sell:'ಮಾರಾಟ ಮಾಡಿ',orders:'ನನ್ನ ಆರ್ಡರ್‌ಗಳು',cart:'ಬುಟ್ಟಿ',
+all:'ಎಲ್ಲಾ',kasuti:'ಕಸೂತಿ',beedu:'ಬೀಡು',wood:'ಮರದ ಕಲೆ',other:'ಇತರೆ',addToCart:'ಬುಟ್ಟಿಗೆ ಸೇರಿಸಿ',buyNow:'ಈಗಲೇ ಖರೀದಿಸಿ',
+by:'ಕಲಾವಿದರು',village:'ಊರು',hours:'ಶ್ರಮದ ಗಂಟೆಗಳು',materials:'ಸಾಮಗ್ರಿಗಳು',aboutCraft:'ಈ ಕಲೆಯ ಕಥೆ',priceBreakdown:'ಬೆಲೆ ವಿವರ',
+matCost:'ಸಾಮಗ್ರಿ ವೆಚ್ಚ',labour:'ಕೈಕೆಲಸದ ಕೂಲಿ',craftValue:'ಕಲಾ ಮೌಲ್ಯ',total:'ಒಟ್ಟು',noItems:'ಯಾವುದೇ ಉತ್ಪನ್ನಗಳಿಲ್ಲ',
+yourName:'ನಿಮ್ಮ ಹೆಸರು',phone:'ಫೋನ್ ಸಂಖ್ಯೆ',address:'ವಿಳಾಸ',payment:'ಪಾವತಿ ವಿಧಾನ',payDemo:'ಡೆಮೊ ಪಾವತಿ (UPI)',cod:'ತಲುಪಿದಾಗ ಹಣ ಪಾವತಿ',
+placeOrder:'ಆರ್ಡರ್ ಮಾಡಿ',orderPlaced:'ಆರ್ಡರ್ ಯಶಸ್ವಿಯಾಗಿದೆ',orderId:'ಆರ್ಡರ್ ಸಂಖ್ಯೆ',placed:'ಆರ್ಡರ್ ಆಗಿದೆ',paid:'ಪಾವತಿ ಆಗಿದೆ',shipped:'ಕಳುಹಿಸಲಾಗಿದೆ',
+markShipped:'ಕಳುಹಿಸಿದೆ ಎಂದು ಗುರುತಿಸಿ',sellTitle:'ನಿಮ್ಮ ಕಲೆಯನ್ನು ಮಾರಾಟಕ್ಕೆ ಇಡಿ',step1:'ಫೋಟೋ',step2:'ವಿವರ',step3:'ಕಥೆ',
+next:'ಮುಂದೆ',back:'ಹಿಂದೆ',submit:'ಪ್ರಕಟಿಸಿ',productName:'ವಸ್ತುವಿನ ಹೆಸರು',craft:'ಕಲೆಯ ಪ್ರಕಾರ',priceRs:'ಬೆಲೆ (₹)',artisanName:'ನಿಮ್ಮ ಹೆಸರು',
+story:'ಈ ಕಲೆಯ ಕಥೆ ಬರೆಯಿರಿ',listed:'ನಿಮ್ಮ ಉತ್ಪನ್ನ ಪ್ರಕಟವಾಗಿದೆ',qty:'ಸಂಖ್ಯೆ',remove:'ತೆಗೆಯಿರಿ',emptyCart:'ಬುಟ್ಟಿ ಖಾಲಿ ಇದೆ',
+choosePhoto:'ಫೋಟೋ ಆಯ್ಕೆ ಮಾಡಿ',noOrders:'ಇನ್ನೂ ಆರ್ಡರ್‌ಗಳಿಲ್ಲ',continue:'ಶಾಪಿಂಗ್ ಮುಂದುವರಿಸಿ',required:'ಅಗತ್ಯ ವಿವರಗಳನ್ನು ತುಂಬಿ',
+materialsCost:'ಸಾಮಗ್ರಿ ವೆಚ್ಚ (₹)',footer:'ಕಲಾಕಟ್ಟೆ — ಕರಾವಳಿ ಕರ್ನಾಟಕದ ಕುಶಲಕರ್ಮಿಗಳಿಗಾಗಿ',back2:'ಹಿಂದೆ ಹೋಗಿ'},
+tcy:{tagline:'ಕರಾವಳಿದ ಕೈಕಲೆ, ಕಲಾವಿದೆರೆಡ್ದ್ ನೇರ ನಿಕುಲೆಗ್',noItems:'ಒಂಜಿ ಉತ್ಪನ್ನ ಇಜ್ಜಿ',emptyCart:'ಬುಟ್ಟಿ ಖಾಲಿ ಉಂಡು',noOrders:'ಇಂದೆ ಆರ್ಡರ್ ಇಜ್ಜಿ',
+listed:'ನಿಕ್ಲೆನ ಉತ್ಪನ್ನ ಪ್ರಕಟ ಆತ್ಂಡ್',orderPlaced:'ಆರ್ಡರ್ ಆತ್ಂಡ್',yourName:'ನಿಕ್ಲೆನ ಪುದರ್',artisanName:'ನಿಕ್ಲೆನ ಪುದರ್',productName:'ಸಾಮಾನ್‌ದ ಪುದರ್'},
+en:{brand:'KalaKatte',tagline:'Coastal crafts, direct from the artisan to you',shop:'Shop',sell:'Sell',orders:'My orders',cart:'Cart',
+all:'All',kasuti:'Kasuti',beedu:'Beedu',wood:'Woodcraft',other:'Other',addToCart:'Add to cart',buyNow:'Buy now',
+by:'Artisan',village:'Village',hours:'Hours of work',materials:'Materials',aboutCraft:'About this craft',priceBreakdown:'Price breakdown',
+matCost:'Materials',labour:'Labour',craftValue:'Craft value',total:'Total',noItems:'No products yet',
+yourName:'Your name',phone:'Phone number',address:'Address',payment:'Payment',payDemo:'Demo payment (UPI)',cod:'Cash on delivery',
+placeOrder:'Place order',orderPlaced:'Order placed',orderId:'Order ID',placed:'Placed',paid:'Paid',shipped:'Shipped',
+markShipped:'Mark as shipped',sellTitle:'List your craft for sale',step1:'Photo',step2:'Details',step3:'Story',
+next:'Next',back:'Back',submit:'Publish',productName:'Product name',craft:'Craft type',priceRs:'Price (₹)',artisanName:'Your name',
+story:'Write the story of this craft',listed:'Your product is published',qty:'Qty',remove:'Remove',emptyCart:'Your cart is empty',
+choosePhoto:'Choose a photo',noOrders:'No orders yet',continue:'Continue shopping',required:'Please fill the required fields',
+materialsCost:'Materials cost (₹)',footer:'KalaKatte — for the artisans of coastal Karnataka',back2:'Back'}
+};
+let lang = ls('kk_lang') || 'kn';
+const t = k => (T[lang] && T[lang][k]) || T.kn[k] || k;
+/* localised field: name -> name_kn / name_en / name */
+const L = (o, f) => lang === 'en' ? (o[f+'_en'] || o[f+'_kn'] || o[f] || '') : (o[f+'_kn'] || o[f+'_en'] || o[f] || '');
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function ls(k, v){ try{ if(v===undefined){ const x=localStorage.getItem(k); return x?JSON.parse(x):null; } localStorage.setItem(k, JSON.stringify(v)); }catch(e){ return null; } }
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const CRAFT_COL = { kasuti:['#B3261E','#1F2A5A'], beedu:['#3E6B48','#D9A21B'], wood:['#1F2A5A','#D9A21B'], other:['#B3261E','#3E6B48'] };
+/* placeholder cross-stitch image, used when a product has no image_url */
+function art(p){
+  const [a,b] = CRAFT_COL[p.craft] || CRAFT_COL.other; let s = '';
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++){
+    const d = Math.abs(r-4)+Math.abs(c-4);
+    if(d<=4 && d%2===0){ const x=c*14+8, y=r*14+8, col=d%4===0?a:b;
+      s += `<path d="M${x} ${y}l9 9M${x+9} ${y}l-9 9" stroke="${col}" stroke-width="2.2" fill="none"/>`; }
+  }
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><rect width="140" height="140" fill="#EFE9DB"/>${s}</svg>`);
+}
+const img = p => p.image_url || art(p);
+
+/* ============================================================
+   API LAYER  -- the ONLY place that talks to data. Swap mock -> real here.
+   Contract for every function is in BACKEND.md.
+   ============================================================ */
+const SEED = [
+ {id:'p1',craft:'kasuti',price:850,hours:10,materials_cost:200,name_kn:'ಕಸೂತಿ ಟೇಬಲ್ ರನ್ನರ್',name_en:'Kasuti Table Runner',artisan_name_kn:'ಲಕ್ಷ್ಮಿ',artisan_name_en:'Lakshmi',village_kn:'ಉಡುಪಿ',village_en:'Udupi',materials_kn:'ಹತ್ತಿ ಬಟ್ಟೆ, ರೇಷ್ಮೆ ದಾರ',materials_en:'Cotton cloth, silk thread',story_kn:'ಒಂದೊಂದು ಹೊಲಿಗೆಯನ್ನೂ ಕೈಯಿಂದ ಎಣಿಸಿ ಹಾಕಿದ ಕಸೂತಿ. ಒಂದು ವಿನ್ಯಾಸಕ್ಕೆ ಹತ್ತಾರು ಗಂಟೆಗಳ ಶ್ರಮ ಬೇಕು.',story_en:'Every stitch is counted and placed by hand. A single design takes many hours of patient work.'},
+ {id:'p2',craft:'kasuti',price:1800,hours:24,materials_cost:450,name_kn:'ಕಸೂತಿ ದುಪಟ್ಟಾ',name_en:'Kasuti Dupatta',artisan_name_kn:'ಪ್ರೇಮಾ',artisan_name_en:'Prema',village_kn:'ಕುಂದಾಪುರ',village_en:'Kundapura',materials_kn:'ಹತ್ತಿ, ಬಣ್ಣದ ದಾರ',materials_en:'Cotton, coloured thread',story_kn:'ಸಾಂಪ್ರದಾಯಿಕ ಕಸೂತಿ ಮೋಟಿಫ್‌ಗಳಿಂದ ಅಲಂಕರಿಸಿದ ದುಪಟ್ಟಾ.',story_en:'A dupatta decorated with traditional Kasuti motifs.'},
+ {id:'p3',craft:'kasuti',price:450,hours:5,materials_cost:90,name_kn:'ಕಸೂತಿ ಕೋಸ್ಟರ್ ಸೆಟ್',name_en:'Kasuti Coaster Set',artisan_name_kn:'ಲಕ್ಷ್ಮಿ',artisan_name_en:'Lakshmi',village_kn:'ಉಡುಪಿ',village_en:'Udupi',materials_kn:'ಹತ್ತಿ ಬಟ್ಟೆ, ದಾರ',materials_en:'Cotton cloth, thread',story_kn:'ನಾಲ್ಕು ಕೋಸ್ಟರ್‌ಗಳ ಸೆಟ್, ಪ್ರತಿಯೊಂದರಲ್ಲೂ ಬೇರೆ ವಿನ್ಯಾಸ.',story_en:'A set of four coasters, each with a different motif.'},
+ {id:'p4',craft:'beedu',price:1200,hours:14,materials_cost:300,name_kn:'ಬೀಡು ಗೋಡೆ ಅಲಂಕಾರ',name_en:'Beedu Wall Piece',artisan_name_kn:'ಸುಂದರ',artisan_name_en:'Sundar',village_kn:'ಕಾರ್ಕಳ',village_en:'Karkala',materials_kn:'ಸ್ಥಳೀಯ ಸಾಮಗ್ರಿಗಳು',materials_en:'Locally sourced materials',story_kn:'ಕರಾವಳಿಯ ಕುಶಲಕರ್ಮಿಯ ಕೈಯಿಂದ ಮಾಡಿದ ಗೋಡೆ ಅಲಂಕಾರ.',story_en:'A wall piece handmade by a coastal artisan.'},
+ {id:'p5',craft:'beedu',price:650,hours:7,materials_cost:150,name_kn:'ಬೀಡು ಅಲಂಕಾರ ಪೆಟ್ಟಿಗೆ',name_en:'Beedu Decorative Box',artisan_name_kn:'ಸುಂದರ',artisan_name_en:'Sundar',village_kn:'ಕಾರ್ಕಳ',village_en:'Karkala',materials_kn:'ಸ್ಥಳೀಯ ಸಾಮಗ್ರಿಗಳು',materials_en:'Locally sourced materials',story_kn:'ಆಭರಣ ಅಥವಾ ಸಣ್ಣ ವಸ್ತುಗಳನ್ನು ಇಡಲು ಕೈಯಿಂದ ಮಾಡಿದ ಪೆಟ್ಟಿಗೆ.',story_en:'A handmade box for jewellery or small keepsakes.'},
+ {id:'p6',craft:'kasuti',price:700,hours:8,materials_cost:160,name_kn:'ಕಸೂತಿ ಕುಶನ್ ಕವರ್',name_en:'Kasuti Cushion Cover',artisan_name_kn:'ಪ್ರೇಮಾ',artisan_name_en:'Prema',village_kn:'ಕುಂದಾಪುರ',village_en:'Kundapura',materials_kn:'ಹತ್ತಿ ಬಟ್ಟೆ, ದಾರ',materials_en:'Cotton cloth, thread',story_kn:'ಮನೆಗೆ ಕರಾವಳಿಯ ಕಲೆಯ ಸ್ಪರ್ಶ ಕೊಡುವ ಕುಶನ್ ಕವರ್.',story_en:'A cushion cover that brings coastal craft into the home.'}
+];
+const mem = {};
+const mock = {
+  get(k){ const v = ls('kk_'+k); if(v) return v; const d = k==='products' ? SEED : []; mem[k]=d; return mem[k]; },
+  set(k,v){ mem[k]=v; ls('kk_'+k, v); }
+};
+async function http(method, path, body){
+  const r = await fetch(CONFIG.API_BASE + path, { method, headers:{'Content-Type':'application/json'}, body: body ? JSON.stringify(body) : undefined });
+  if(!r.ok) throw new Error(method+' '+path+' -> '+r.status);
+  return r.json();
+}
+const API = {
+  async listProducts(){ return CONFIG.USE_MOCK ? mock.get('products') : http('GET','/api/products'); },
+  async getProduct(id){ return CONFIG.USE_MOCK ? mock.get('products').find(p=>p.id===id) : http('GET','/api/products/'+id); },
+  async createProduct(d){
+    if(!CONFIG.USE_MOCK) return http('POST','/api/products', d);
+    const p = {...d, id:'p'+Date.now()}; mock.set('products',[p,...mock.get('products')]); return p;
+  },
+  async createOrder(d){   /* d.payment_method 'demo' | 'cod' ; demo payment is mocked -> status 'paid' */
+    if(!CONFIG.USE_MOCK) return http('POST','/api/orders', d);
+    const o = {...d, id:'KK'+String(Date.now()).slice(-6), status:d.payment_method==='demo'?'paid':'placed', created_at:new Date().toISOString()};
+    mock.set('orders',[o,...mock.get('orders')]); return o;
+  },
+  async listOrders(){ return CONFIG.USE_MOCK ? mock.get('orders') : http('GET','/api/orders'); },
+  async setOrderStatus(id, status){
+    if(!CONFIG.USE_MOCK) return http('PATCH','/api/orders/'+id, {status});
+    const l = mock.get('orders').map(o=>o.id===id?{...o,status}:o); mock.set('orders',l); return l.find(o=>o.id===id);
+  }
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let cart = ls('kk_cart') || [];          /* [{id, qty}] */
+let filter = 'all', flash = '', sellStep = 1;
+let draft = { craft:'kasuti' };           /* sell form */
+let buyer = { payment_method:'demo' };    /* checkout form */
+const saveCart = () => ls('kk_cart', cart);
+const cartCount = () => cart.reduce((n,i)=>n+i.qty,0);
+
+/* ============================================================
+   VIEWS
+   ============================================================ */
+function layout(route, body){
+  const a = r => route===r ? 'on' : '';
+  return `<header><div class="wrap bar">
+    <a href="#/" class="brand">${t('brand')}<small>${lang==='en'?'ಕಲಾಕಟ್ಟೆ':'KalaKatte'}</small></a>
+    <nav>
+      <a href="#/" class="${a('')}">${t('shop')}</a>
+      <a href="#/sell" class="${a('sell')}">${t('sell')}</a>
+      <a href="#/orders" class="${a('orders')}">${t('orders')}</a>
+      <a href="#/cart" class="${a('cart')}">${t('cart')}${cartCount()?`<span class="badge">${cartCount()}</span>`:''}</a>
+      <div class="lang">${[['kn','ಕನ್ನಡ'],['tcy','ತುಳು'],['en','EN']].map(([k,n])=>`<button data-a="lang" data-v="${k}" class="${lang===k?'on':''}">${n}</button>`).join('')}</div>
+    </nav></div></header><div class="stitch"></div>
+    <main><div class="wrap">${flash?`<div class="flash">${esc(flash)}</div>`:''}${body}</div></main>
+    <footer><div class="wrap">${t('footer')}</div></footer>`;
+}
+
+async function shopView(){
+  const all = await API.listProducts();
+  const list = filter==='all' ? all : all.filter(p=>p.craft===filter);
+  return `<h1>${t('tagline')}</h1>
+  <div class="chips">${['all','kasuti','beedu','wood','other'].map(c=>`<button class="chip ${filter===c?'on':''}" data-a="filter" data-v="${c}">${t(c)}</button>`).join('')}</div>
+  ${list.length ? `<div class="grid">${list.map(p=>`<a class="card" href="#/p/${esc(p.id)}"><img src="${img(p)}" alt="${esc(L(p,'name'))}"><div class="cb">
+    <div class="tag">${t(p.craft)}</div><h3>${esc(L(p,'name'))}</h3>
+    <div class="sub">${esc(L(p,'artisan_name'))}, ${esc(L(p,'village'))}</div><div class="price">₹${p.price}</div></div></a>`).join('')}</div>` : `<p class="muted">${t('noItems')}</p>`}`;
+}
+
+async function productView(id){
+  const p = await API.getProduct(id);
+  if(!p) return `<p class="muted">${t('noItems')}</p>`;
+  const mat = +p.materials_cost||0, lab = (+p.hours||0)*CONFIG.LABOUR_RATE, cv = Math.max(0, p.price-mat-lab);
+  return `<a href="#/" class="muted">← ${t('back2')}</a>
+  <div class="two" style="margin-top:12px"><img src="${img(p)}" alt="${esc(L(p,'name'))}">
+  <div><div class="tag">${t(p.craft)}</div><h1>${esc(L(p,'name'))}</h1>
+    <div class="price" style="font-size:22px">₹${p.price}</div>
+    <p>${t('by')}: <b>${esc(L(p,'artisan_name'))}</b><br>${t('village')}: ${esc(L(p,'village'))}</p>
+    <div class="row"><button class="btn red" data-a="buy" data-v="${esc(p.id)}">${t('buyNow')}</button>
+    <button class="btn ghost" data-a="add" data-v="${esc(p.id)}">${t('addToCart')}</button></div></div></div>
+  <div class="two">
+    <div class="box"><h2 style="margin-top:0">${t('aboutCraft')}</h2><p>${esc(L(p,'story'))}</p>
+      <p class="muted">${t('materials')}: ${esc(L(p,'materials'))}<br>${t('hours')}: ${esc(p.hours||'-')}</p></div>
+    <div class="box"><h2 style="margin-top:0">${t('priceBreakdown')}</h2><table>
+      <tr><td>${t('matCost')}</td><td>₹${mat}</td></tr>
+      <tr><td>${t('labour')} (${p.hours||0} × ₹${CONFIG.LABOUR_RATE})</td><td>₹${lab}</td></tr>
+      <tr><td>${t('craftValue')}</td><td>₹${cv}</td></tr>
+      <tr class="tot"><td>${t('total')}</td><td>₹${p.price}</td></tr></table></div>
+  </div>`;
+}
+
+async function cartView(){
+  if(!cart.length) return `<h1>${t('cart')}</h1><p class="muted">${t('emptyCart')}</p><a class="btn" href="#/">${t('continue')}</a>`;
+  const all = await API.listProducts();
+  const lines = cart.map(i=>({p:all.find(x=>x.id===i.id), qty:i.qty})).filter(l=>l.p);
+  const total = lines.reduce((s,l)=>s+l.p.price*l.qty,0);
+  return `<h1>${t('cart')}</h1>
+  ${lines.map(l=>`<div class="item"><img src="${img(l.p)}" alt=""><div class="g"><b>${esc(L(l.p,'name'))}</b><div class="sub">₹${l.p.price}</div></div>
+    <input type="number" min="1" value="${l.qty}" data-q="${esc(l.p.id)}" aria-label="${t('qty')}">
+    <button class="btn ghost" data-a="remove" data-v="${esc(l.p.id)}">${t('remove')}</button></div>`).join('')}
+  <p style="text-align:right"><b>${t('total')}: ₹${total}</b></p>
+  <div class="box form">
+    <label>${t('yourName')}</label><input data-b="buyer_name" value="${esc(buyer.buyer_name||'')}">
+    <label>${t('phone')}</label><input data-b="phone" inputmode="tel" value="${esc(buyer.phone||'')}">
+    <label>${t('address')}</label><textarea rows="3" data-b="address">${esc(buyer.address||'')}</textarea>
+    <label>${t('payment')}</label>
+    <select data-b="payment_method"><option value="demo" ${buyer.payment_method==='demo'?'selected':''}>${t('payDemo')}</option><option value="cod" ${buyer.payment_method==='cod'?'selected':''}>${t('cod')}</option></select>
+    <div class="row"><button class="btn red" data-a="order">${t('placeOrder')}</button></div></div>`;
+}
+
+async function ordersView(){
+  const list = await API.listOrders();
+  if(!list.length) return `<h1>${t('orders')}</h1><p class="muted">${t('noOrders')}</p>`;
+  const steps = ['placed','paid','shipped'];
+  return `<h1>${t('orders')}</h1>` + list.map(o=>{
+    const idx = steps.indexOf(o.status);
+    return `<div class="box"><b>${t('orderId')}: ${esc(o.id)}</b> <span class="muted">· ₹${o.total}</span>
+      <div class="sub">${esc((o.items||[]).map(i=>i.name+' × '+i.qty).join(', '))}</div>
+      <div class="track">${steps.map((s,n)=>`<span class="${n<=idx?'done':''}">${t(s)}</span>`).join('')}</div>
+      ${o.status!=='shipped'?`<div class="row"><button class="btn ghost" data-a="ship" data-v="${esc(o.id)}">${t('markShipped')}</button></div>`:''}</div>`;
+  }).join('');
+}
+
+function sellView(){
+  const f = (k,v='') => esc(draft[k] ?? v);
+  const head = `<h1>${t('sellTitle')}</h1><div class="steps">${[1,2,3].map(n=>`<span class="${sellStep===n?'on':''}">${t('step'+n)}</span>`).join('')}</div><div class="form">`;
+  let body = '';
+  if(sellStep===1) body = `<label>${t('choosePhoto')}</label><input type="file" id="photo" accept="image/*">
+    ${draft.image_url?`<img class="prev" src="${draft.image_url}" alt="">`:''}
+    <div class="row"><button class="btn" data-a="step" data-v="2">${t('next')}</button></div>`;
+  if(sellStep===2) body = `<label>${t('productName')}</label><input data-f="name" value="${f('name')}">
+    <label>${t('craft')}</label><select data-f="craft">${['kasuti','beedu','wood','other'].map(c=>`<option value="${c}" ${draft.craft===c?'selected':''}>${t(c)}</option>`).join('')}</select>
+    <label>${t('priceRs')}</label><input type="number" min="1" data-f="price" value="${f('price')}">
+    <label>${t('artisanName')}</label><input data-f="artisan_name" value="${f('artisan_name')}">
+    <label>${t('village')}</label><input data-f="village" value="${f('village')}">
+    <div class="row"><button class="btn ghost" data-a="step" data-v="1">${t('back')}</button><button class="btn" data-a="step" data-v="3">${t('next')}</button></div>`;
+  if(sellStep===3) body = `<label>${t('hours')}</label><input type="number" min="0" data-f="hours" value="${f('hours')}">
+    <label>${t('materials')}</label><input data-f="materials" value="${f('materials')}">
+    <label>${t('materialsCost')}</label><input type="number" min="0" data-f="materials_cost" value="${f('materials_cost')}">
+    <label>${t('story')}</label><textarea rows="4" data-f="story">${f('story')}</textarea>
+    <div class="row"><button class="btn ghost" data-a="step" data-v="2">${t('back')}</button><button class="btn red" data-a="publish">${t('submit')}</button></div>`;
+  return head + body + '</div>';
+}
+
+/* ============================================================
+   ROUTER + RENDER
+   ============================================================ */
+async function render(){
+  const [, r, id] = (location.hash.slice(1) || '/').split('/');
+  let body;
+  try{
+    if(r==='p') body = await productView(id);
+    else if(r==='cart') body = await cartView();
+    else if(r==='orders') body = await ordersView();
+    else if(r==='sell') body = sellView();
+    else body = await shopView();
+  }catch(e){ body = `<p class="muted">Error: ${esc(e.message)}</p>`; }
+  document.documentElement.lang = lang==='en' ? 'en' : 'kn';
+  document.getElementById('app').innerHTML = layout(r||'', body);
+  flash = '';
+}
+window.addEventListener('hashchange', render);
+
+/* ============================================================
+   EVENTS (delegated)
+   ============================================================ */
+function addToCart(id){ const i = cart.find(c=>c.id===id); i ? i.qty++ : cart.push({id, qty:1}); saveCart(); }
+document.addEventListener('click', async e=>{
+  const el = e.target.closest('[data-a]'); if(!el) return;
+  const a = el.dataset.a, v = el.dataset.v;
+  if(a==='lang'){ lang=v; ls('kk_lang',v); }
+  else if(a==='filter'){ filter=v; }
+  else if(a==='add'){ addToCart(v); }
+  else if(a==='buy'){ addToCart(v); location.hash='#/cart'; return; }
+  else if(a==='remove'){ cart = cart.filter(c=>c.id!==v); saveCart(); }
+  else if(a==='step'){ if(+v>sellStep && sellStep===2 && (!draft.name||!draft.price)){ alert(t('required')); return; } sellStep=+v; }
+  else if(a==='publish'){
+    await API.createProduct({...draft, price:+draft.price, hours:+draft.hours||0, materials_cost:+draft.materials_cost||0});
+    draft={craft:'kasuti'}; sellStep=1; flash=t('listed'); location.hash='#/'; return render();
+  }
+  else if(a==='order'){
+    if(!buyer.buyer_name||!buyer.phone||!buyer.address){ alert(t('required')); return; }
+    const all = await API.listProducts();
+    const items = cart.map(i=>{ const p=all.find(x=>x.id===i.id); return p&&{product_id:p.id,name:L(p,'name'),price:p.price,qty:i.qty}; }).filter(Boolean);
+    const o = await API.createOrder({...buyer, items, total:items.reduce((s,i)=>s+i.price*i.qty,0)});
+    cart=[]; saveCart(); flash=t('orderPlaced')+' · '+o.id; location.hash='#/orders'; return render();
+  }
+  else if(a==='ship'){ await API.setOrderStatus(v,'shipped'); }
+  render();
+});
+document.addEventListener('input', e=>{
+  const el = e.target;
+  if(el.dataset.f) draft[el.dataset.f] = el.value;
+  if(el.dataset.b) buyer[el.dataset.b] = el.value;
+  if(el.dataset.q){ const i=cart.find(c=>c.id===el.dataset.q); if(i && +el.value>0){ i.qty=+el.value; saveCart(); } }
+});
+document.addEventListener('change', e=>{
+  if(e.target.id==='photo' && e.target.files[0]){
+    const fr = new FileReader();   /* mock only: stores data URL. Real backend: upload file, store returned URL */
+    fr.onload = () => { draft.image_url = fr.result; render(); };
+    fr.readAsDataURL(e.target.files[0]);
+  }
+  if(e.target.dataset.q) render();
+});
+render();
+</script>
+</body>
+</html>
